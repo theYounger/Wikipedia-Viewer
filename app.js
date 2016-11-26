@@ -1,12 +1,31 @@
-$(document).ready(function onReady() {
-   // when filling search bar, we can use an html form element -- alternatives?
-   $("#searchbar")
+$(document).ready(function onReady(){
+   function loadResults(results) {
+      var pageResults = results.query.pages;
+      for (var page in pageResults) {
+         var link = $("<a></a>").attr("href", "http://en.wikipedia.org/?curid=" + pageResults[page].pageid).html(pageResults[page].title + "<br>").append(pageResults[page].extract);
+         $("<div></div>").addClass("selection").html(link).appendTo(".search-results");
+      }
+    }
 
-   // autocomplete features ... perhaps have the inner html self complete based on what is chosen in the drop-down menu. Have the search bar show in gray the rest of the word, and upon a key press it will complete that word. require to listen to tab key clicks. Also up and down arrow for perusing through search dropdown.
-
-   // when search button is clicked
-   function getWikiData(url) {
-      $.get(url, wikiData).
+   function clickSearch(done) {
+      var searchVal = $("#search").val();
+      $(".search-box").css({
+         "transition-property": "margin-top",
+         "transition-duration": "0.6s",
+         "margin-top": "0px"
+      }).trigger("transitioned");
    }
 
+   function transitioned() {
+      console.log("hello world");
+      $.ajax({
+          type: "GET",
+          url: "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&list=&generator=allpages&exlimit=10&exintro=1&explaintext=1&gapfrom=" + searchVal + "&callback=?",
+          dataType: "json",
+          success: loadResults
+      });
+   }
+
+   $("#search-btn").click(clickSearch);
+   $(".search-box").on("transitioned", transitioned, true);
 });
