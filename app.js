@@ -41,7 +41,7 @@ $(document).ready(function readyDocument(){
 
    function onMouseEnter() {
       var randoFeels = $.makeArray($(".feels-randoview").children());
-      var randomNum = Math.random();
+      var randoNum = Math.floor(Math.random() * (9 - 5) + 5);
       var sq = ASQ();
 
       randoFeels.forEach(function(ele, ind, arr) {
