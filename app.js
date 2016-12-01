@@ -1,16 +1,25 @@
 $(document).ready(function readyDocument(){
    function transitionendSearch() {
       var searchVal = $("#search").val();
+      var searchUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&list=&generator=allpages&exlimit=10&exintro=1&explaintext=1&gapfrom=" + searchVal + "&callback=?";
+
       $.ajax({
           type: "GET",
-          url: "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&list=&generator=allpages&exlimit=10&exintro=1&explaintext=1&gapfrom=" + searchVal + "&callback=?",
+          url: searchUrl,
           dataType: "json",
           success: loadResults
       });
    }
 
    function clickSearch() {
-      $(".search-box").addClass("slide-up");
+      var match = $(".search-box").attr("class").match(/slide-up/g);
+
+      if(match) {
+         $(".search-results").empty();
+         transitionendSearch();
+      } else {
+         $(".search-box").addClass("slide-up");
+      }
    }
 
    function loadResults(results) {
@@ -18,7 +27,10 @@ $(document).ready(function readyDocument(){
       for (var page in pageResults) {
          var link = "http://en.wikipedia.org/?curid=" + pageResults[page].pageid;
          var title = $("<h3></h3>").html(pageResults[page].title);
-         var elemA = $("<a></a>").attr("href", link);
+         var elemA = $("<a></a>").attr({
+            "href": link,
+            "target": "_blank"
+         });
          var elemDiv = $("<div></div>")
                         .addClass("article")
                         .hover(function onHover() {
@@ -43,6 +55,7 @@ $(document).ready(function readyDocument(){
       var randoFeels = $.makeArray($(".feels-randoview").children());
       var randoNum = Math.floor(Math.random() * (9 - 5) + 5);
       var sq = ASQ();
+      console.log(randoNum)
 
       randoFeels.forEach(function(ele, ind, arr) {
          sq.then(function(done) {
@@ -50,14 +63,9 @@ $(document).ready(function readyDocument(){
                done();
             });
 
-            if($(ele).attr("class") === "the-one") {
-               $(ele).removeClass("the-one")
-                  .addClass("all-else")
-               ;
-
-               $(arr[ind + 1]).removeClass("all-else")
-                  .addClass("the-one")
-               ;
+            if(ind < randoNum) {
+               $(ele).removeClass("the-one").addClass("all-else");
+               $(arr[ind + 1]).removeClass("all-else").addClass("the-one");
             }
          });
       });
